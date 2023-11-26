@@ -1,5 +1,6 @@
 import { CronJob } from "cron";
 import { sleep } from "../../sleep";
+import { task_history } from "../utils/TaskHistory";
 
 export async function TaskThree(
   cron_str: string,
@@ -12,6 +13,7 @@ export async function TaskThree(
     onTick: async function () {
       await sleep(2000);
       let log = `${task_name} ${(count += update)}`;
+      await task_history(log, task_name);
       console.log(log);
     },
     start: true,

@@ -2,10 +2,11 @@ import { REPLICA_ID } from "../../consts";
 import { rabbit_conn } from "../../rabbit/connect";
 import { sleep } from "../../sleep";
 
-const exchange = "amq.direct";
+const say_exchange = "amq.direct";
+const ask_exchange = "amq.fanout";
 
 const ask_task_key = "ask_task_name";
-const ask_task_queue = "ask_task_name";
+const ask_task_queue = `ask_task_name__${REPLICA_ID}`;
 
 const say_task_key = "say_task_name";
 const say_task_queue = "say_task_name";
@@ -19,14 +20,14 @@ export async function AskTaskNames(): Promise<string[]> {
   const tasks: string[] = [];
   const ch = await rabbit_conn.createChannel();
   ch.publish(
-    exchange,
+    ask_exchange,
     ask_task_key,
     Buffer.from(JSON.stringify({ id: REPLICA_ID }))
   );
   await ch.assertQueue(say_task_queue, {
-    messageTtl: 3000,
+    messageTtl: 30000,
   });
-  ch.bindQueue(say_task_key, exchange, say_task_queue);
+  ch.bindQueue(say_task_queue, say_exchange, say_task_key);
 
   const consume = await ch.consume(say_task_queue, (msg) => {
     console.log("--Ask consime");
@@ -60,9 +61,9 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
   const ch = await rabbit_conn.createChannel();
 
   await ch.assertQueue(ask_task_queue);
-  ch.bindQueue(ask_task_key, exchange, ask_task_queue);
+  ch.bindQueue(ask_task_queue, ask_exchange, ask_task_key);
   ch.consume(ask_task_queue, async (msg) => {
-    console.log("--Say consime");
+    console.log("--Say consume");
     if (!msg) {
       console.log("Error: message is none");
       return;
@@ -79,7 +80,13 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
       id: parsed_msg.id,
       task_names: tasks_cb(),
     };
-    ch.publish(exchange, say_task_key, Buffer.from(JSON.stringify(tasks)));
+    console.log("--Send", tasks);
+    ch.publish(say_exchange, say_task_key, Buffer.from(JSON.stringify(tasks)));
     ch.ack(msg);
   });
 }
+
+process.once("SIGINT", async () => {
+  (await rabbit_conn.createChannel()).deleteQueue(ask_task_queue);
+  (await rabbit_conn.createChannel()).deleteQueue(say_task_queue);
+});
