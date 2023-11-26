@@ -2,12 +2,12 @@ import { CronJob } from "cron";
 import { sleep } from "../../sleep";
 import { task_history } from "../utils/TaskHistory";
 
-export async function TaskOne(
+export async function TaskEight(
   cron_str: string,
   task_name: string
 ): Promise<void> {
   let count = 0;
-  let update = 1;
+  let update = 8;
   CronJob.from({
     cronTime: cron_str,
     onTick: async function () {

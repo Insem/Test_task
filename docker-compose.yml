@@ -9,21 +9,31 @@ services:
     environment:
       - POSTGRES_PASSWORD=task
       - POSTGRES_USER=task
-      - POSTGRES_DB=task  
+      - POSTGRES_DB=task
   rabbit:
     image: rabbitmq:3.13-rc-management
     restart: always
     ports:
       - "15672:15672/tcp"
-      - "5672:5672/tcp"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
   task:
     depends_on:
       - db
-    build: .
+      - rabbit
+    build:
+      dockerfile: ./app/Dockerfile
     deploy:
       mode: replicated
-      replicas: 6
+      replicas: ${REPLICA_COUNT}
+    restart: always
+  router:
+    depends_on:
+      - db
+      - rabbit
+    build:
+      dockerfile: ./router/Dockerfile
+    ports:
+      - "8080:8080/tcp"
     restart: always

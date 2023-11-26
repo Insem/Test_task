@@ -38,7 +38,5 @@ export async function send_balance(
         replyTo: queue,
       }
     );
-
-    //ch.deleteQueue(queue);
   });
 }

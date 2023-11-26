@@ -6,7 +6,7 @@ const pgsql = await knex({
     database: "task",
     user: "task",
     password: "task",
-    host: "localhost",
+    host: "db",
     port: 5432,
   },
 });

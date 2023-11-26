@@ -37,7 +37,7 @@ export async function AskTaskNames(): Promise<string[]> {
     }
 
     const parsed_msg: TaskNameType = JSON.parse(msg.content.toString());
-
+    console.log("--Tasks raw", parsed_msg);
     if (!parsed_msg.id || !parsed_msg.task_names) {
       console.log("Error: say broken message", parsed_msg);
       return;
@@ -52,7 +52,7 @@ export async function AskTaskNames(): Promise<string[]> {
     ch.ack(msg);
   });
 
-  await sleep(2000);
+  await sleep(10000);
   await ch.close();
   return tasks;
 }
@@ -75,10 +75,11 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
       console.log("Error: ask broken message");
       return;
     }
-
+    const task_names = tasks_cb();
+    console.log("--Task names answer", task_names);
     const tasks: TaskNameType = {
       id: parsed_msg.id,
-      task_names: tasks_cb(),
+      task_names,
     };
     console.log("--Send", tasks);
     ch.publish(say_exchange, say_task_key, Buffer.from(JSON.stringify(tasks)));
