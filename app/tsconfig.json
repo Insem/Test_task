@@ -1,0 +1,13 @@
+{
+  // https://www.typescriptlang.org/tsconfig#compilerOptions
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "strict": true,
+    "sourceMap": true,
+    "types": ["node"],
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
