@@ -11,6 +11,7 @@ import { REPLICA_COUNT, REPLICA_ID } from "../consts";
 import { TaskEight } from "./tasks/Task_8";
 import { TaskNine } from "./tasks/Task_9";
 import { TaskTen } from "./tasks/Task_10";
+import { sleep } from "../sleep";
 
 export class TaskManagerClass {
   constructor() {
@@ -33,7 +34,6 @@ export class TaskManagerClass {
   async init() {
     let tasks = await AskTaskNames();
     console.log("--Start 1", tasks.length);
-
     console.log("--Start 3", tasks, new Date().toUTCString());
     const load_count = Math.ceil(this.task_list.length / REPLICA_COUNT);
     const load_list = this.task_list

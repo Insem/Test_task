@@ -18,16 +18,6 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-  task:
-    depends_on:
-      - db
-      - rabbit
-    build:
-      dockerfile: ./app/Dockerfile
-    deploy:
-      mode: replicated
-      replicas: ${REPLICA_COUNT}
-    restart: always
   router:
     depends_on:
       - db
@@ -36,4 +26,15 @@ services:
       dockerfile: ./router/Dockerfile
     ports:
       - "8080:8080/tcp"
+    restart: always
+  task:
+    depends_on:
+      - db
+      - rabbit
+      - router
+    build:
+      dockerfile: ./app/Dockerfile
+    deploy:
+      mode: replicated
+      #replicas: ${REPLICA_COUNT}
     restart: always

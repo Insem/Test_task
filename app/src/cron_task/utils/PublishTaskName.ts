@@ -27,7 +27,7 @@ export async function AskTaskNames(): Promise<string[]> {
   await ch.assertQueue(say_task_queue, {
     messageTtl: 30000,
   });
-  ch.bindQueue(say_task_queue, say_exchange, say_task_key);
+  await ch.bindQueue(say_task_queue, say_exchange, say_task_key);
 
   const consume = await ch.consume(say_task_queue, (msg) => {
     console.log("--Ask consime");
@@ -52,7 +52,7 @@ export async function AskTaskNames(): Promise<string[]> {
     ch.ack(msg);
   });
 
-  await sleep(10000);
+  await sleep(5000);
   await ch.close();
   return tasks;
 }
@@ -61,7 +61,7 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
   const ch = await rabbit_conn.createChannel();
 
   await ch.assertQueue(ask_task_queue);
-  ch.bindQueue(ask_task_queue, ask_exchange, ask_task_key);
+  await ch.bindQueue(ask_task_queue, ask_exchange, ask_task_key);
   ch.consume(ask_task_queue, async (msg) => {
     console.log("--Say consume");
     if (!msg) {
