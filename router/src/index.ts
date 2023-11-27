@@ -10,7 +10,7 @@ app.get(
   "/subtract_balance",
   async (req: Request, res: Response): Promise<void> => {
     const send: TBalance | undefined = await validate_balance(req, res);
-    console.log("--Send", send);
+
     if (!send) {
       res.status(500);
       return;
@@ -23,7 +23,7 @@ app.get(
 
 app.get("/add_balance", async (req: Request, res: Response): Promise<void> => {
   const send: TBalance | undefined = await validate_balance(req, res);
-  console.log("--Send", send);
+
   if (!send) {
     res.status(500);
     return;

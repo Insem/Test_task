@@ -35,7 +35,7 @@ export async function get_tasks(operation: Operation): Promise<unknown> {
       Buffer.from(JSON.stringify({ operation }))
     );
     await sleep(1000);
-    console.log("--Results", result);
+
     ch.deleteQueue(RPC_QUEUE_TASKS);
     resolve(result);
   });

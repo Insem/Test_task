@@ -30,14 +30,12 @@ export async function AskTaskNames(): Promise<string[]> {
   await ch.bindQueue(say_task_queue, say_exchange, say_task_key);
 
   const consume = await ch.consume(say_task_queue, (msg) => {
-    console.log("--Ask consime");
     if (!msg) {
       console.log("Error: message is none");
       return;
     }
 
     const parsed_msg: TaskNameType = JSON.parse(msg.content.toString());
-    console.log("--Tasks raw", parsed_msg);
     if (!parsed_msg.id || !parsed_msg.task_names) {
       console.log("Error: say broken message", parsed_msg);
       return;
@@ -63,7 +61,6 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
   await ch.assertQueue(ask_task_queue);
   await ch.bindQueue(ask_task_queue, ask_exchange, ask_task_key);
   ch.consume(ask_task_queue, async (msg) => {
-    console.log("--Say consume");
     if (!msg) {
       console.log("Error: message is none");
       return;
@@ -76,12 +73,11 @@ export async function SayTaskNames(tasks_cb: () => string[]) {
       return;
     }
     const task_names = tasks_cb();
-    console.log("--Task names answer", task_names);
     const tasks: TaskNameType = {
       id: parsed_msg.id,
       task_names,
     };
-    console.log("--Send", tasks);
+
     ch.publish(say_exchange, say_task_key, Buffer.from(JSON.stringify(tasks)));
     ch.ack(msg);
   });

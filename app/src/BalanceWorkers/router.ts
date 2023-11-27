@@ -18,11 +18,9 @@ export async function router_balance(): Promise<void> {
       return;
     }
     const event = JSON.parse(msg.content.toString()) as TBalanceEvent;
-    console.log("--Event", event);
     switch (event.operation) {
       case "subtract": {
         const result = await psql_subtract_balance(event.balance);
-        console.log("--Result subtruct", result);
         ch.sendToQueue(
           msg.properties.replyTo,
           Buffer.from(JSON.stringify(result)),
@@ -34,7 +32,6 @@ export async function router_balance(): Promise<void> {
       }
       case "add": {
         const result = await psql_add_balance(event.balance);
-        console.log("--Result subtruct", result);
         ch.sendToQueue(
           msg.properties.replyTo,
           Buffer.from(JSON.stringify(result)),
@@ -75,16 +72,14 @@ export async function router_status(manager: TaskManagerClass): Promise<void> {
       return;
     }
     const event = JSON.parse(msg.content.toString()) as TBalanceEvent;
-    console.log("--Event", event);
     switch (event.operation) {
       case "status": {
-        console.log("--Status 1");
         ch.publish(
           "amq.direct",
           "answer_tasks",
           Buffer.from(JSON.stringify(manager.get_status()))
         );
-        console.log("--Status 23");
+
         break;
       }
       default: {

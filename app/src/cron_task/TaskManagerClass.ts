@@ -33,8 +33,7 @@ export class TaskManagerClass {
   load_list: TaskClass[];
   async init() {
     let tasks = await AskTaskNames();
-    console.log("--Start 1", tasks.length);
-    console.log("--Start 3", tasks, new Date().toUTCString());
+
     const load_count = Math.ceil(this.task_list.length / REPLICA_COUNT);
     const load_list = this.task_list
       .filter((el) => tasks.indexOf(el.name) == -1)
@@ -43,10 +42,8 @@ export class TaskManagerClass {
 
     const load_tasks = this.get_tasks_names.bind(this);
     await SayTaskNames(load_tasks);
-    console.log("--Task list", this.load_list);
 
     for (const task of this.load_list) {
-      console.log("--Start task in cycle");
       await task.start();
     }
   }
